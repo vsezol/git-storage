@@ -39,8 +39,9 @@
     "verdaccio": "^6.0.5"
   },
   "workspaces": [
-    "example",
-    "git-storage"
+    "git-storage",
+    "git-storage/*",
+    "example"
   ],
   "nx": {
     "includedScripts": [],

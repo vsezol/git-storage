@@ -4,10 +4,16 @@
   "files": [],
   "references": [
     {
-      "path": "./example"
+      "path": "./git-storage"
     },
     {
-      "path": "./git-storage"
+      "path": "./git-storage/example-e2e"
+    },
+    {
+      "path": "./git-storage/example"
+    },
+    {
+      "path": "./example"
     }
   ]
 }

@@ -23,13 +23,13 @@ A TypeScript library that provides Git-based persistent storage with automatic s
 ## Installation
 
 ```bash
-npm install git-storage
+npm install @vsezol/git-storage
 ```
 
 ## Quick Start
 
 ```typescript
-import { GitStorage } from 'git-storage';
+import { GitStorage } from '@vsezol/git-storage';
 
 // Define your data structure
 interface MyData {

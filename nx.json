@@ -40,7 +40,8 @@
       "plugin": "@nx/jest/plugin",
       "options": {
         "targetName": "test"
-      }
+      },
+      "exclude": ["git-storage/example-e2e/**/*"]
     }
   ],
   "targetDefaults": {
@@ -62,5 +63,8 @@
     "version": {
       "preVersionCommand": "npx nx run-many -t build"
     }
+  },
+  "sync": {
+    "applyChanges": false
   }
 }
