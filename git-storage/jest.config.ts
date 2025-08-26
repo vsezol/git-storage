@@ -10,9 +10,8 @@ const swcJestConfig = JSON.parse(
 swcJestConfig.swcrc = false;
 
 export default {
-  displayName: '@git-storage/example-e2e',
-  preset: '../../jest.preset.js',
-  setupFiles: ['<rootDir>/src/test-setup.ts'],
+  displayName: 'git-storage',
+  preset: '../jest.preset.js',
   testEnvironment: 'node',
   transform: {
     '^.+\\.[tj]s$': ['@swc/jest', swcJestConfig],

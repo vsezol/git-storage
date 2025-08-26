@@ -1,82 +1,247 @@
 # GitStorage
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+A TypeScript library that provides Git-based persistent storage with automatic synchronization. Store your application data in a Git repository with full version control, automatic commits, and seamless data persistence.
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is almost ready ✨.
+## Features
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/node?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+- 🚀 **Git-based Storage**: Store data directly in Git repositories
+- 🔄 **Auto Synchronization**: Automatic pull/push operations
+- 📝 **Type Safety**: Full TypeScript support with generics
+- 🔒 **Version Control**: Every change is tracked with Git commits
+- 🌐 **Remote Backup**: Data is automatically backed up to remote repositories
+- 🔧 **Flexible Configuration**: Customizable branches, file names, and authors
 
-## Finish your CI setup
+## Use Cases
 
-[Click here to finish setting up your workspace!](https://cloud.nx.app/connect/3UriCWTwew)
+- **Configuration Management**: Store application settings with version history
+- **User Data Persistence**: Maintain user profiles and preferences
+- **Content Management**: Store and version content data
+- **Backup Solutions**: Automatic data backup with Git history
+- **Distributed Data**: Share data across multiple applications
+- **Audit Trails**: Track all data changes with Git commits
 
+## Installation
 
-## Run tasks
-
-To run the dev server for your app, use:
-
-```sh
-npx nx serve example
+```bash
+npm install git-storage
 ```
 
-To create a production bundle:
+## Quick Start
 
-```sh
-npx nx build example
+```typescript
+import { GitStorage } from 'git-storage';
+
+// Define your data structure
+interface MyData {
+  users: User[];
+  settings: AppSettings;
+}
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+interface AppSettings {
+  theme: 'light' | 'dark';
+  language: string;
+}
+
+// Initialize GitStorage
+const storage = new GitStorage<MyData>({
+  repositoryUrl: 'https://github.com/your-username/your-data-repo',
+  fileName: 'app-data',
+  branch: 'main',
+});
+
+async function main() {
+  // Initialize the storage
+  await storage.init();
+
+  // Store data
+  await storage.set('users', [{ id: 1, name: 'John Doe', email: 'john@example.com' }]);
+
+  await storage.set('settings', {
+    theme: 'dark',
+    language: 'en',
+  });
+
+  // Read data
+  const users = storage.get('users');
+  console.log('Users:', users);
+
+  // Update data
+  await storage.patch('settings', { theme: 'light' });
+
+  // Synchronize with remote repository
+  await storage.sync();
+}
+
+main().catch(console.error);
 ```
 
-To see all available targets to run for a project, run:
+## Configuration Options
 
-```sh
-npx nx show project example
+```typescript
+interface GitStorageOptions {
+  repositoryUrl: string; // Git repository URL (required)
+  branch?: string; // Git branch (default: 'main')
+  fileName?: string; // JSON file name (default: 'root')
+  localPath?: string; // Local repository path (auto-generated)
+  author?: GitAuthor; // Git commit author
+}
+
+interface GitAuthor {
+  name: string; // Author name
+  email: string; // Author email
+}
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+### Example with Full Configuration
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Add new projects
-
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
-
-Use the plugin's generator to create new projects.
-
-To generate a new application, use:
-
-```sh
-npx nx g @nx/node:app demo
+```typescript
+const storage = new GitStorage<MyData>({
+  repositoryUrl: 'https://github.com/your-username/your-data-repo',
+  branch: 'data-storage',
+  fileName: 'production-data',
+  author: {
+    name: 'Your App',
+    email: 'app@yourcompany.com',
+  },
+});
 ```
 
-To generate a new library, use:
+## API Reference
 
-```sh
-npx nx g @nx/node:lib mylib
+| Method                         | Description                                                 | Parameters                                                   | Returns             |
+| ------------------------------ | ----------------------------------------------------------- | ------------------------------------------------------------ | ------------------- |
+| `init()`                       | Initialize storage and clone/sync repository                | -                                                            | `Promise<void>`     |
+| `get<K>(key)`                  | Retrieve data by key                                        | `key: K`                                                     | `T[K] \| undefined` |
+| `set<K>(key, data, commit?)`   | Store data with key                                         | `key: K`, `data: T[K]`, `commit?: string`                    | `Promise<void>`     |
+| `patch<K>(key, data, commit?)` | Update existing data (merge for objects, append for arrays) | `key: K`, `data: Partial<T[K]> \| T[K][]`, `commit?: string` | `Promise<void>`     |
+| `delete<K>(key, commit?)`      | Delete data by key                                          | `key: K`, `commit?: string`                                  | `Promise<boolean>`  |
+| `clear(commit?)`               | Clear all data                                              | `commit?: string`                                            | `Promise<void>`     |
+| `sync()`                       | Synchronize with remote repository (pull + push)            | -                                                            | `Promise<void>`     |
+
+## Advanced Examples
+
+### Working with Arrays
+
+```typescript
+interface BlogData {
+  posts: BlogPost[];
+}
+
+interface BlogPost {
+  id: number;
+  title: string;
+  content: string;
+  createdAt: Date;
+}
+
+const blogStorage = new GitStorage<BlogData>({
+  repositoryUrl: 'https://github.com/your-username/blog-data',
+});
+
+await blogStorage.init();
+
+// Set initial posts
+await blogStorage.set('posts', [{ id: 1, title: 'First Post', content: 'Hello World!', createdAt: new Date() }]);
+
+// Add new posts (patch appends to arrays)
+await blogStorage.patch('posts', [{ id: 2, title: 'Second Post', content: 'More content...', createdAt: new Date() }]);
 ```
 
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
+### Working with Objects
 
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+```typescript
+interface UserProfile {
+  profile: {
+    name: string;
+    email: string;
+    preferences: {
+      theme: string;
+      notifications: boolean;
+    };
+  };
+}
 
+const userStorage = new GitStorage<UserProfile>({
+  repositoryUrl: 'https://github.com/your-username/user-data',
+});
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+await userStorage.init();
 
-## Install Nx Console
+// Set initial profile
+await userStorage.set('profile', {
+  name: 'John Doe',
+  email: 'john@example.com',
+  preferences: {
+    theme: 'light',
+    notifications: true,
+  },
+});
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+// Update only preferences (patch merges objects)
+await userStorage.patch('profile', {
+  preferences: {
+    theme: 'dark',
+  },
+});
+```
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+### Custom Commit Messages
 
-## Useful links
+```typescript
+// Custom commit messages for better tracking
+await storage.set('users', userData, 'Added new user registration');
+await storage.patch('settings', newSettings, 'Updated theme preferences');
+await storage.delete('tempData', 'Cleaned up temporary data');
+```
 
-Learn more:
+### Error Handling
 
-- [Learn more about this workspace setup](https://nx.dev/nx-api/node?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+```typescript
+try {
+  await storage.init();
 
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+  // Attempt to patch non-existent data
+  await storage.patch('nonExistent', { some: 'data' });
+} catch (error) {
+  if (error.message.includes('does not exist')) {
+    console.log('Key does not exist, using set() instead');
+    await storage.set('nonExistent', { some: 'data' });
+  }
+}
+```
+
+## Repository Structure
+
+GitStorage creates a simple file structure in your Git repository:
+
+```
+your-data-repo/
+├── your-file-name.json    # Your data in JSON format
+└── .git/                  # Git metadata
+```
+
+The JSON file contains your data in a flat key-value structure:
+
+```json
+{
+  "users": [...],
+  "settings": {...},
+  "posts": [...]
+}
+```
+
+## Requirements
+
+- Node.js 16+
+- Git installed on the system
+- Write access to the specified Git repository
+
+## License
+
+MIT License - see [LICENSE](LICENSE) file for details.

@@ -12,15 +12,15 @@
         "defaultConfiguration": "production",
         "options": {
           "platform": "node",
-          "outputPath": "apps/example/dist",
+          "outputPath": "example/dist",
           "format": [
             "cjs"
           ],
           "bundle": false,
-          "main": "apps/example/src/main.ts",
-          "tsConfig": "apps/example/tsconfig.app.json",
+          "main": "example/src/main.ts",
+          "tsConfig": "example/tsconfig.app.json",
           "assets": [
-            "apps/example/src/assets"
+            "example/src/assets"
           ],
           "esbuildOptions": {
             "sourcemap": true,
@@ -48,8 +48,8 @@
         "cache": true,
         "executor": "@nx/js:prune-lockfile",
         "outputs": [
-          "{workspaceRoot}/apps/example/dist/package.json",
-          "{workspaceRoot}/apps/example/dist/package-lock.json"
+          "{workspaceRoot}/example/dist/package.json",
+          "{workspaceRoot}/example/dist/package-lock.json"
         ],
         "options": {
           "buildTarget": "build"
@@ -61,7 +61,7 @@
         ],
         "cache": true,
         "outputs": [
-          "{workspaceRoot}/apps/example/dist/workspace_modules"
+          "{workspaceRoot}/example/dist/workspace_modules"
         ],
         "executor": "@nx/js:copy-workspace-modules",
         "options": {
